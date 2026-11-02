@@ -2,12 +2,27 @@
   "name": "relay-desk",
   "version": "1.0.0",
   "private": true,
-  "description": "A self-hosted Discord bot chat dashboard for your own bot token.",
+  "description": "Self-hosted Discord bot chat client: read channels and manually reply as your bot.",
   "type": "module",
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test"
-  }
+    "test": "node --test",
+    "demo": "node scripts/demo-server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codewithriza/relay-desk.git"
+  },
+  "keywords": [
+    "discord",
+    "discord-bot",
+    "bot-dashboard",
+    "discord-client",
+    "self-hosted",
+    "webhook"
+  ]
 }
