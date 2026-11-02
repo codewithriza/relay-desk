@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Relay Desk — Discord bot chat dashboard</title>
+    <meta name="description" content="A private, self-hosted Discord bot dashboard. Connect your own bot token to browse channels, read messages, and reply from one focused workspace." />
+    <meta name="robots" content="index,follow" />
+    <meta name="theme-color" content="#0e1117" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Relay Desk — Discord bot chat dashboard" />
+    <meta property="og:description" content="Bring your own Discord bot. Browse channels, read messages, and reply from a focused dashboard." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="server-rail" aria-label="Servers">
+        <button class="server-pill active" type="button" title="Relay Desk" aria-label="Relay Desk">
+          <span>RD</span>
+        </button>
+        <div class="rail-divider" aria-hidden="true"></div>
+        <button class="server-pill action" id="openSetupButton" type="button" title="Connect" aria-label="Connect">
+          <span>+</span>
+        </button>
+        <button class="server-pill action" id="refreshButton" type="button" title="Refresh messages" aria-label="Refresh messages">
+          <span>R</span>
+        </button>
+      </aside>
+
+      <aside class="channel-sidebar" aria-label="Channels and direct messages">
+        <header class="server-header">
+          <strong>Relay Desk</strong>
+          <button class="header-icon" id="openSetupButtonSmall" type="button" title="Connection settings" aria-label="Connection settings">
+            +
+          </button>
+        </header>
+
+        <div class="quick-switcher">
+          <label class="sr-only" for="chatSearch">Search channels</label>
+          <input id="chatSearch" type="search" autocomplete="off" placeholder="Find or start a conversation" />
+        </div>
+
+        <nav class="sidebar-scroll">
+          <section class="sidebar-section">
+            <button class="channel-row static active" type="button">
+              <span aria-hidden="true">#</span>
+              <strong>relay-console</strong>
+            </button>
+            <button class="channel-row static" id="openSetupButtonInline" type="button">
+              <span aria-hidden="true">+</span>
+              <strong>connect-bot</strong>
+            </button>
+          </section>
+
+          <section class="onboarding compact" aria-label="Onboarding progress">
+            <div class="step current" id="stepConnect">
+              <span class="step-index">1</span>
+              <div>
+                <strong>Connect</strong>
+                <span id="stepConnectText">Choose a relay method</span>
+              </div>
+            </div>
+            <div class="step" id="stepTarget">
+              <span class="step-index">2</span>
+              <div>
+                <strong>Target</strong>
+                <span id="stepTargetText">Channel or personal DM</span>
+              </div>
+            </div>
+            <div class="step" id="stepSend">
+              <span class="step-index">3</span>
+              <div>
+                <strong>Send</strong>
+                <span id="stepSendText">Composer unlocks here</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="chat-browser hidden" id="chatBrowser" aria-label="Server channels">
+            <div class="section-title">
+              <button class="section-toggle" type="button" aria-label="Server channels">v</button>
+              <strong>Text Channels</strong>
+              <button class="section-action" id="reloadChatsButton" type="button" title="Refresh channels">R</button>
+            </div>
+            <div class="chat-count" id="chatCount">No channels loaded</div>
+            <div class="chat-list" id="chatList"></div>
+          </section>
+
+          <section class="dm-panel hidden" id="dmPanel" aria-label="Direct messages">
+            <div class="section-title">
+              <button class="section-toggle" type="button" aria-label="Direct messages">v</button>
+              <strong>Direct Messages</strong>
+              <button class="section-action" id="scanPeopleButton" type="button" title="Refresh recent users">@</button>
+            </div>
+            <p class="dm-note">Recent users are scanned from readable channels. Click a name to open a bot DM.</p>
+            <div class="people-list" id="peopleList"></div>
+            <details class="manual-dm">
+              <summary>Open by user ID</summary>
+              <form id="dmForm" class="dm-form">
+                <label class="field">
+                  <span>User ID</span>
+                  <input id="dmUserId" name="dmUserId" inputmode="numeric" autocomplete="off" placeholder="Paste user ID" />
+                </label>
+                <button class="sidebar-button" id="openDmButton" type="submit">Open DM</button>
+              </form>
+            </details>
+          </section>
+        </nav>
+
+        <footer class="account-bar">
+          <div class="account-avatar" aria-hidden="true">RD</div>
+          <div class="account-text">
+            <strong id="connectionLabel">Not connected</strong>
+            <span id="accountStatus">offline</span>
+          </div>
+          <button id="disconnectButton" class="account-action" type="button" disabled title="Disconnect" aria-label="Disconnect">
+            X
+          </button>
+        </footer>
+      </aside>
+
+      <section class="chat-view" aria-label="Chat">
+        <header class="chat-header">
+          <div class="chat-title-group">
+            <span class="target-icon" id="targetIcon" aria-hidden="true">#</span>
+            <div>
+              <h1 id="chatTitle">relay-console</h1>
+              <span id="chatSubtitle">Connect a bot or webhook to start.</span>
+            </div>
+          </div>
+          <p class="sr-only" id="chatKicker">Target</p>
+          <div class="toolbar" aria-label="Channel actions">
+            <button class="toolbar-button" type="button" id="openSetupButtonTop" title="Connection settings" aria-label="Connection settings">+</button>
+            <button class="toolbar-button" type="button" id="refreshButtonTop" title="Refresh messages" aria-label="Refresh messages">R</button>
+            <div class="status-cluster">
+              <span class="status-dot" id="statusDot" aria-hidden="true"></span>
+              <span class="pill" id="modePill">Offline</span>
+            </div>
+          </div>
+        </header>
+
+        <div class="chat-body">
+          <section class="message-column" aria-label="Messages">
+            <div class="notice" id="notice" role="status">Waiting for connection.</div>
+
+            <div class="empty-state" id="emptyState">
+              <div class="empty-avatar" aria-hidden="true">#</div>
+              <h2>Welcome to relay-console</h2>
+              <p id="emptyStateText">Connect a bot token or webhook, then pick a channel or DM.</p>
+              <button class="primary-button" id="openSetupButtonEmpty" type="button">Connect to Discord API</button>
+            </div>
+
+            <ol class="messages" id="messages" aria-live="polite"></ol>
+
+            <form class="composer" id="messageForm">
+              <button class="composer-tool" type="button" id="openSetupButtonComposer" title="Connection settings" aria-label="Connection settings">+</button>
+              <div class="composer-input">
+                <label class="sr-only" for="messageInput">Message</label>
+                <textarea id="messageInput" rows="1" maxlength="2000" placeholder="Message #relay-console" disabled></textarea>
+              </div>
+              <div class="composer-meta">
+                <span id="composerHint">No target selected</span>
+                <span id="charCount">0/2000</span>
+              </div>
+              <button class="send-button" id="sendButton" type="submit" disabled aria-label="Send message" title="Send">
+                Send
+              </button>
+            </form>
+          </section>
+
+          <aside class="member-panel" aria-label="Profile and session">
+            <section class="member-section">
+              <div class="member-heading">Session</div>
+              <article class="session-card">
+                <div class="session-avatar" aria-hidden="true">RD</div>
+                <div>
+                  <strong id="memberSessionName">Not connected</strong>
+                  <span id="memberSessionStatus">Start a secure session.</span>
+                </div>
+              </article>
+            </section>
+
+            <section class="member-section">
+              <div class="member-heading">Profile</div>
+              <article class="profile-card hidden" id="profileCard" aria-label="User profile">
+                <div class="profile-banner"></div>
+                <div class="profile-body">
+                  <div class="profile-avatar" id="profileAvatar"></div>
+                  <div class="profile-main">
+                    <strong id="profileName"></strong>
+                    <span id="profileHandle"></span>
+                  </div>
+                  <dl class="profile-facts">
+                    <div>
+                      <dt>ID</dt>
+                      <dd id="profileId"></dd>
+                    </div>
+                    <div>
+                      <dt>Type</dt>
+                      <dd id="profileType"></dd>
+                    </div>
+                  </dl>
+                </div>
+              </article>
+              <div class="member-empty" id="profileEmpty">Open a DM to see a user profile here.</div>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <div class="setup-modal hidden" id="setupModal" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+      <div class="modal-backdrop" data-close-setup></div>
+      <section class="modal-panel">
+        <header class="modal-header">
+          <div>
+            <p class="eyebrow">Discord API session</p>
+            <h2 id="setupTitle">Connect Relay Desk</h2>
+          </div>
+          <button class="modal-close" id="closeSetupButton" type="button" aria-label="Close">X</button>
+        </header>
+
+        <form id="connectForm" class="connect-form">
+          <div class="mode-tabs" role="tablist" aria-label="Connection mode">
+            <button class="mode-card" id="webhookMode" type="button" data-mode="webhook">
+              <span class="mode-icon" aria-hidden="true">W</span>
+              <span>
+                <strong>Webhook</strong>
+                <small>Send only. Webhooks cannot read chat history.</small>
+              </span>
+            </button>
+            <button class="mode-card active" id="botMode" type="button" data-mode="bot">
+              <span class="mode-icon" aria-hidden="true">B</span>
+              <span>
+                <strong>Bot token</strong>
+                <small>Browse channels and DMs using your own bot.</small>
+              </span>
+            </button>
+          </div>
+
+          <label class="field webhook-field hidden">
+            <span>Webhook URL</span>
+            <input id="webhookUrl" name="webhookUrl" type="password" autocomplete="off" placeholder="https://discord.com/api/webhooks/..." />
+          </label>
+
+          <div class="bot-fields">
+            <label class="field">
+              <span>Bot token</span>
+              <input id="token" name="token" type="password" autocomplete="off" placeholder="Bot token" required />
+            </label>
+            <label class="field">
+              <span>Fallback channel ID</span>
+              <input id="channelId" name="channelId" inputmode="numeric" autocomplete="off" placeholder="Optional channel ID" />
+            </label>
+          </div>
+
+          <p class="credential-note">Use a Discord <strong>bot token</strong>, never a personal account token. Credentials stay in this server’s memory for the session and are cleared when you disconnect or the session expires. Only connect to a server you trust.</p>
+
+          <div class="modal-actions">
+            <button class="primary-button" id="connectButton" type="submit">Start session</button>
+            <button class="secondary-button" id="cancelSetupButton" type="button">Cancel</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
