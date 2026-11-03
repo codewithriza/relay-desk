@@ -1,5 +1,7 @@
 # Relay Desk — chat as your Discord bot
 
+**[Launch the web app →](https://rizamohamed.com/discord-bot)** · [Quick start](docs/quickstart.md) · [Connection troubleshooting](docs/troubleshooting.md) · [Self-host](#run-it-locally)
+
 A self-hosted Discord bot chat client that lets you read messages and manually reply as your bot from a browser. Connect your own bot token, pick a server channel or open a bot DM, and type your response. Your message appears in Discord under the bot’s name.
 
 You write the replies yourself. Relay Desk does not generate AI responses or require you to write bot commands.
@@ -56,7 +58,7 @@ Open [http://localhost:3001](http://localhost:3001) and enter `demo` in the bot 
 
 ### Send a real reply as your bot
 
-1. Start the app with `npm start` and open [http://localhost:3000](http://localhost:3000).
+1. [Open the hosted app](https://rizamohamed.com/discord-bot), or run `npm start` and open [http://localhost:3000](http://localhost:3000).
 2. Connect your Discord bot token using the setup steps below.
 3. Choose a channel and read the conversation. Press **Refresh** to load new messages.
 4. Type your reply and press **Send**. Discord displays the reply as your bot.
