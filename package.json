@@ -20,9 +20,17 @@
   "keywords": [
     "discord",
     "discord-bot",
-    "bot-dashboard",
     "discord-client",
+    "discord-dashboard",
+    "bot-dashboard",
+    "discord-api",
+    "discord-webhook",
+    "direct-messages",
     "self-hosted",
-    "webhook"
-  ]
+    "nodejs"
+  ],
+  "homepage": "https://rizamohamed.com/discord-bot",
+  "bugs": {
+    "url": "https://github.com/codewithriza/relay-desk/issues"
+  }
 }
